@@ -14,6 +14,7 @@ class CsFixerSetup
 
             // modified rules
             'binary_operator_spaces' => ['operators' => ['=>' => null]],
+            'cast_spaces' => ['space' => 'none'],
             'class_definition' => ['single_item_single_line' => true],
             'concat_space' => ['spacing' => 'one'],
             'global_namespace_import' => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
@@ -25,6 +26,9 @@ class CsFixerSetup
             'phpdoc_summary' => false,
             'phpdoc_to_comment' => false, // conflicts with phpstan
             'yoda_style' => false,
+
+            // added rules
+            'no_useless_else' => true,
         ];
     }
 
