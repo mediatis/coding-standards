@@ -1,0 +1,146 @@
+#!/usr/bin/env php
+<?php
+
+$binDirectory = $_composer_bin_dir ?? __DIR__ . '/../../bin';
+$targetPackageDirectory = realpath($binDirectory . '/../..');
+$codingStandardsPackageDirectory = realpath(__DIR__ . '/..');
+$examplePackagePath = 'example-package';
+
+class MediatisCodingStandardsSetup
+{
+    public function __construct(
+        protected string $targetPackageDirectory,
+        protected string $codingStandardsPackageDirectory,
+        protected string $examplePackageDirectory,
+    ) {
+    }
+
+    protected function updateFolderStructure(string $filePath): void
+    {
+        if (!str_starts_with($filePath, $this->targetPackageDirectory)) {
+            throw new Exception(sprintf('file path "%s" does not seem to be within the package directory.', $filePath));
+        }
+        $pathParts = explode('/', $filePath);
+        array_pop($pathParts);
+        $folderPath = implode('/', $pathParts);
+        if (!is_dir($folderPath)) {
+            mkdir($folderPath, recursive: true);
+        }
+    }
+
+    protected function updateFileContents(string $sourceContents, string $targetContents, array $config): string
+    {
+        $sourceData = json_decode($sourceContents, true, 512, JSON_THROW_ON_ERROR);
+        $targetData = json_decode($targetContents, true, 512, JSON_THROW_ON_ERROR);
+
+        foreach ($config as $key => $merge) {
+            if (!isset($sourceData[$key])) {
+                throw new Exception(sprintf('Key "%s" not found in source data!', $key));
+            }
+            if ($merge && isset($targetData[$key]) && is_array($targetData[$key])) {
+                foreach ($sourceData[$key] as $configKey => $configValue) {
+                    if (array_key_exists($configKey, $targetData[$key])) {
+                        unset($targetData[$key][$configKey]);
+                    }
+                    $targetData[$key][$configKey] = $configValue;
+                }
+            } else {
+                $targetData[$key] = $sourceData[$key];
+            }
+        }
+
+        return json_encode($targetData, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+    }
+
+    protected function updateFile(string $filePath, ?array $config = null): void
+    {
+        $sourcePath = $this->getSourcePath($filePath);
+        $targetPath = $this->getTargetPath($filePath);
+        $sourceContents = file_get_contents($sourcePath);
+        if ($sourceContents === false) {
+            throw new Exception(sprintf('File "%s" not found!', $sourcePath));
+        }
+        if ($config !== null) {
+            $targetContents = file_get_contents($targetPath);
+            if ($targetContents === false) {
+                throw new Exception(sprintf('File "%s" not found!', $targetPath));
+            }
+            $targetContents = $this->updateFileContents($sourceContents, $targetContents, $config);
+        } else {
+            $targetContents = $sourceContents;
+        }
+
+        $this->updateFolderStructure($targetPath);
+        file_put_contents($targetPath, $targetContents);
+    }
+
+    protected function getSourcePath(string $filePath): string
+    {
+        return $this->codingStandardsPackageDirectory . '/' . $this->examplePackageDirectory . '/' . $filePath;
+    }
+
+    protected function getTargetPath(string $filePath): string
+    {
+        return $this->targetPackageDirectory . '/'. $filePath;
+    }
+
+    protected function setupCsFixerConfig(): void
+    {
+        $this->updateFile('.php-cs-fixer.php');
+    }
+
+    protected function setupRectorConfig(): void
+    {
+        $this->updateFile('rector.php');
+    }
+
+    protected function setupPhpStanConfig(): void
+    {
+        $this->updateFile('phpstan.neon');
+    }
+
+    protected function setupGithubPipeline(): void
+    {
+        $this->updateFile('.github/workflows/ci.yml');
+    }
+
+    protected function setupComposerJson(): void
+    {
+        $this->updateFile('composer.json', [
+            'scripts' => true,
+            'scripts-descriptions' => true,
+        ]);
+    }
+
+    public function setup(): void
+    {
+        $this->setupCsFixerConfig();
+        $this->setupRectorConfig();
+        $this->setupPhpStanConfig();
+        $this->setupGithubPipeline();
+        $this->setupComposerJson();
+    }
+}
+
+print(PHP_EOL);
+print('#####################################################' . PHP_EOL);
+print('#            MEDIATIS - CODING STANDARDS            #' . PHP_EOL);
+print('#####################################################' . PHP_EOL);
+print(PHP_EOL);
+
+print('Setting up configuration...');
+try {
+    $codingStandardsSetup = new MediatisCodingStandardsSetup(
+        $targetPackageDirectory,
+        $codingStandardsPackageDirectory,
+        $examplePackagePath
+    );
+    $codingStandardsSetup->setup();
+    print(' success!' . PHP_EOL);
+    print(PHP_EOL);
+} catch (Exception $e) {
+    print(' failed!' . PHP_EOL);
+    print(PHP_EOL);
+    print('Reason: ' . $e->getMessage() . PHP_EOL);
+    print(PHP_EOL);
+}
