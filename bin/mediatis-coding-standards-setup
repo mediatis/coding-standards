@@ -4,6 +4,7 @@
 $binDirectory = $_composer_bin_dir ?? __DIR__ . '/../../bin';
 $targetPackageDirectory = realpath($binDirectory . '/../..');
 $codingStandardsPackageDirectory = realpath(__DIR__ . '/..');
+$requiredFolderPaths = ['src', 'tests/Unit', 'tests/Integration'];
 $examplePackagePath = 'example-package';
 
 class MediatisCodingStandardsSetup
@@ -11,6 +12,7 @@ class MediatisCodingStandardsSetup
     public function __construct(
         protected string $targetPackageDirectory,
         protected string $codingStandardsPackageDirectory,
+        protected array $requiredFolderPaths,
         protected string $examplePackageDirectory,
     ) {
     }
@@ -112,6 +114,15 @@ class MediatisCodingStandardsSetup
         ]);
     }
 
+    protected function setupRequiredFolders(): void
+    {
+        foreach ($this->requiredFolderPaths as $requiredFolderPath) {
+            if (!is_dir($this->getTargetPath($requiredFolderPath))) {
+                $this->updateFile($requiredFolderPath . '/.gitkeep');
+            }
+        }
+    }
+
     public function setup(): void
     {
         $this->setupCsFixerConfig();
@@ -119,6 +130,7 @@ class MediatisCodingStandardsSetup
         $this->setupPhpStanConfig();
         $this->setupGithubPipeline();
         $this->setupComposerJson();
+        $this->setupRequiredFolders();
     }
 }
 
@@ -133,6 +145,7 @@ try {
     $codingStandardsSetup = new MediatisCodingStandardsSetup(
         $targetPackageDirectory,
         $codingStandardsPackageDirectory,
+        $requiredFolderPaths,
         $examplePackagePath
     );
     $codingStandardsSetup->setup();
