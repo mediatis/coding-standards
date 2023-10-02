@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$binDirectory = $_composer_bin_dir ?? __DIR__ . '/../../bin';
+$binDirectory = $_composer_bin_dir ?? __DIR__ . '/../../../bin';
 $targetPackageDirectory = realpath($binDirectory . '/../..');
 $codingStandardsPackageDirectory = realpath(__DIR__ . '/..');
 $requiredFolderPaths = ['src', 'tests/Unit', 'tests/Integration'];
