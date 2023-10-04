@@ -3,6 +3,6 @@
 ## Installation
 
 ```
-composer require --dev mediatis/coding-standards
+composer require --dev --with-all-dependencies mediatis/coding-standards
 ./vendor/bin/mediatis-coding-standards-setup
 ```
