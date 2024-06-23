@@ -57,7 +57,7 @@ class CodingStandardsSetup
         }
     }
 
-    protected function getDependencyVersionConstraintsFromComposerData(string $package, string $type = 'full'): ?array
+    protected function getDependencyVersionConstraintsFromComposerData(string $package, string $type = 'full'): array
     {
         $allowedVersions = $this->supportedPackageVersions[$package]['versions'];
         $versions = [];
@@ -86,7 +86,7 @@ class CodingStandardsSetup
         }
 
         if ($versions === null || $versions === []) {
-            throw new Exception('Package version mismatch detected. Supported ' . $package . ' versions are: ' . implode(', ', $this->supportedPackageVersions[$package]['versions']));
+            throw new Exception('Package version mismatch detected. Supported ' . $package . ' versions are: ' . implode(', ', $allowedVersions));
         }
 
         return $versions;
@@ -168,19 +168,12 @@ class CodingStandardsSetup
         $sourceData = Yaml::parse($sourceContents);
         $targetData = Yaml::parse($targetContents);
 
-        if (!$this->checkKeysRecursive($config, $sourceData)) {
-            throw new Exception('Configured key not found in source data!');
+        if (!is_array($targetData)) {
+            $targetData = [];
         }
 
         $this->mergeRecursiveWithOverrule($sourceData, $config);
-
-        foreach (array_keys($config) as $key) {
-            if ($this->checkKeysRecursive($config, $targetData)) {
-                $this->mergeRecursiveWithOverrule($targetData[$key], $sourceData[$key]);
-            } else {
-                $targetData[$key] = $sourceData[$key];
-            }
-        }
+        $this->mergeRecursiveWithOverrule($targetData, $sourceData);
 
         return Yaml::dump($targetData, 99);
     }
@@ -266,17 +259,11 @@ class CodingStandardsSetup
     {
         $matrix = [];
         foreach (array_keys($this->supportedPackageVersions) as $package) {
-            $versionConstraint = $this->getDependencyVersionConstraintsFromComposerData($package);
-            if ($versionConstraint !== null && $versionConstraint !== []) {
-                $matrix[$package . '_version'] = $versionConstraint;
-            } else {
-                throw new Exception('Unable to set up CI workflows due to version mismatch. Supported ' . $package . ' versions are: ' . implode(', ', $this->supportedPackageVersions[$package]['versions']));
-            }
+            $matrix[$package . '_version'] = $this->getDependencyVersionConstraintsFromComposerData($package);
         }
 
         $this->updateFile('.gitlab-ci.yml',
             config: [
-                'stages' => true,
                 'coding-standards' => [
                     'parallel' => [
                         'matrix' => [
@@ -289,13 +276,10 @@ class CodingStandardsSetup
 
         $this->updateFile('.github/workflows/ci.yml',
             config: [
-                'on' => true,
                 'jobs' => [
                     'coding-standards' => [
                         'strategy' => [
-                            'matrix' => [
-                                $matrix,
-                            ],
+                            'matrix' => $matrix,
                         ],
                     ],
                 ],
@@ -303,30 +287,14 @@ class CodingStandardsSetup
         );
     }
 
-    protected function checkKeysRecursive($config, $data): bool
-    {
-        foreach ($config as $key => $value) {
-            if (is_array($value)) {
-                if (!isset($data[$key]) || !is_array($data[$key])) {
-                    return false;
-                }
-
-                // Recursively check nested arrays
-                $this->checkKeysRecursive($value, $data[$key]);
-            } elseif (!isset($data[$key])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     protected function setupComposerJson(): void
     {
-        $this->updateFile('composer.json', config: [
-            'scripts' => true,
-            'scripts-descriptions' => true,
-        ]);
+        $this->updateFile('composer.json',
+            config: [
+                'scripts' => true,
+                'scripts-descriptions' => true,
+            ]
+        );
     }
 
     protected function setupRequiredFolders(): void
