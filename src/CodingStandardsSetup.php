@@ -264,7 +264,7 @@ class CodingStandardsSetup
 
         $this->updateFile('.gitlab-ci.yml',
             config: [
-                'coding-standards' => [
+                'code-quality' => [
                     'parallel' => [
                         'matrix' => [
                             $matrix,
@@ -277,7 +277,7 @@ class CodingStandardsSetup
         $this->updateFile('.github/workflows/ci.yml',
             config: [
                 'jobs' => [
-                    'coding-standards' => [
+                    'code-quality' => [
                         'strategy' => [
                             'matrix' => $matrix,
                         ],
