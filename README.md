@@ -25,42 +25,48 @@ Run the kickstart script to install configuration files.
 ./vendor/bin/mediatis-coding-standards-setup
 ```
 
+The files that are usually merged (mostly CI configuration) can be reset and overwritten with the argument `reset`. The `composer.json` is an exception; it is always merged.
+
+```
+./vendor/bin/mediatis-coding-standards-setup reset
+```
+
 ## Usage - Check
 
 Run all checks:
 
 ```
-composer run-script ci
+composer ci
 ```
 
 Run group checks:
 
 ```
 # all php tests and code quality checks
-composer run-script ci:php
+composer ci:php
 
 # all php tests
-composer run-script ci:php:tests
+composer ci:php:tests
 
 # all php code quality checks
-composer run-script ci:php:static
+composer ci:php:static
 
 # all composer-related checks
-composer run-script ci:composer
+composer ci:composer
 ```
 
 Run specific checks:
 
 ```
-composer run-script ci:composer:normalize
-composer run-script ci:composer:psr-verify
-composer run-script ci:composer:validate
-composer run-script ci:php:lint
-composer run-script ci:php:rector
-composer run-script ci:php:cs-fixer
-composer run-script ci:php:stan
-composer run-script ci:php:tests:unit
-composer run-script ci:php:tests:integration
+composer ci:composer:normalize
+composer ci:composer:psr-verify
+composer ci:composer:validate
+composer ci:php:lint
+composer ci:php:rector
+composer ci:php:cs-fixer
+composer ci:php:stan
+composer ci:php:tests:unit
+composer ci:php:tests:integration
 ```
 
 ## Usage - Fix
@@ -68,20 +74,20 @@ composer run-script ci:php:tests:integration
 Run all fixes:
 
 ```
-composer run-script fix
+composer fix
 ```
 
 Run group fixes:
 
 ```
-composer run-script fix:php
-composer run-script fix:composer
+composer fix:php
+composer fix:composer
 ```
 
 Run specific fixes:
 
 ```
-composer run-script fix:php:rector
-composer run-script fix:php:cs
-composer run-script fix:composer:normalize
+composer fix:php:rector
+composer fix:php:cs
+composer fix:composer:normalize
 ```
