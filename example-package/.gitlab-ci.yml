@@ -4,7 +4,6 @@ coding-standards:
     parallel:
         matrix:
             -
-                check: ['static', 'dynamic']
                 php_version: []
     cache:
         key:
@@ -26,4 +25,4 @@ coding-standards:
     image: 'php:${php_version}'
     stage: coding-standards
     script:
-        - 'composer ci:${check}'
+        - 'composer ci'
