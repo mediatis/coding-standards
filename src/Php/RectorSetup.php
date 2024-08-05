@@ -3,6 +3,7 @@
 namespace Mediatis\CodingStandards\Php;
 
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
+use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
 use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
@@ -49,6 +50,7 @@ class RectorSetup
             CatchExceptionNameMatchingTypeRector::class,
             AddLiteralSeparatorToNumberRector::class,
             UnSpreadOperatorRector::class, // breaks code, removed in rector 0.18
+            VarConstantCommentRector::class, // conflicts with other standards (array<string>), removed in latest rector
         ];
     }
 
