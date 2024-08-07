@@ -37,7 +37,8 @@
     "config": {
         "allow-plugins": {
             "ergebnis/composer-normalize": true
-        }
+        },
+        "cache-dir": "./cache/composer"
     },
     "scripts": {
         "ci": [
