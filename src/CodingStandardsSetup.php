@@ -193,7 +193,7 @@ class CodingStandardsSetup
         };
     }
 
-    protected function resetFile(string $targetFilePath): void
+    private function resetFile(string $targetFilePath): void
     {
         $targetPath = $this->getTargetPath($targetFilePath);
         if (file_exists($targetPath)) {
