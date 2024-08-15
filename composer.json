@@ -40,84 +40,61 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": [
-            "@link-extension"
-        ],
         "ci": [
             "@ci:static",
             "@ci:dynamic"
         ],
         "ci:composer": [
-            "@ci:composer:normalize",
-            "@ci:composer:psr-verify"
+            "@ci:composer:static"
         ],
         "ci:composer:normalize": "@composer normalize --no-check-lock --dry-run",
         "ci:composer:psr-verify": "@composer dumpautoload --optimize --strict-psr",
-        "ci:coverage": [
-            "@ci:coverage:unit",
-            "@ci:coverage:functional"
+        "ci:composer:static": [
+            "@ci:composer:validate",
+            "@ci:composer:psr-verify",
+            "@ci:composer:normalize"
         ],
-        "ci:coverage:functional": [
-            "@coverage:create-directories",
-            ".Build/bin/phpunit -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml --whitelist Classes --coverage-php=.Build/coverage/functional.cov Tests/Functional"
-        ],
-        "ci:coverage:merge": [
-            "@coverage:create-directories",
-            "@php tools/phpcov merge --clover=./.Build/logs/clover.xml ./.Build/coverage/"
-        ],
-        "ci:coverage:unit": [
-            "@coverage:create-directories",
-            ".Build/bin/phpunit -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/UnitTests.xml --whitelist Classes --coverage-php=.Build/coverage/unit.cov Tests/Unit"
-        ],
+        "ci:composer:validate": "@composer validate --strict",
         "ci:dynamic": [
             "@ci:tests"
         ],
-        "ci:json": [
-            "@ci:json:lint"
-        ],
-        "ci:json:lint": "find . ! -path '*.Build/*' ! -path '*node_modules/*' -name '*.json' | xargs -r php .Build/bin/jsonlint -q",
         "ci:php": [
+            "@ci:php:static",
+            "@ci:php:dynamic"
+        ],
+        "ci:php:cs-fixer": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php -v --dry-run --using-cache no --diff src tests",
+        "ci:php:dynamic": [
+            "@ci:php:tests"
+        ],
+        "ci:php:lint": "find .*.php *.php src tests -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
+        "ci:php:rector": "./vendor/bin/rector --dry-run",
+        "ci:php:stan": "php -d memory_limit=228M ./vendor/bin/phpstan --no-progress --no-interaction analyse",
+        "ci:php:static": [
             "@ci:php:rector",
             "@ci:php:cs-fixer",
             "@ci:php:lint",
             "@ci:php:stan"
         ],
-        "ci:php:cs-fixer": "php-cs-fixer fix --config .php-cs-fixer.php -v --dry-run --using-cache no --diff",
-        "ci:php:lint": "find .*.php *.php Classes Configuration Tests -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
-        "ci:php:rector": "rector --dry-run",
-        "ci:php:stan": "php -d memory_limit=228M ./.Build/bin/phpstan --no-progress",
+        "ci:php:tests": [
+            "@ci:php:tests:unit",
+            "@ci:php:tests:integration"
+        ],
+        "ci:php:tests:integration": "./vendor/bin/phpunit -d memory_limit=228M --bootstrap vendor/autoload.php --testdox --colors=always tests/Integration/",
+        "ci:php:tests:unit": "./vendor/bin/phpunit -d memory_limit=228M --bootstrap vendor/autoload.php --testdox --colors=always tests/Unit/",
         "ci:static": [
-            "@ci:composer",
-            "@ci:json",
-            "@ci:php",
-            "@ci:yaml"
+            "@ci:composer:static",
+            "@ci:php:static"
         ],
         "ci:tests": [
-            "@ci:tests:unit",
-            "@ci:tests:functional"
+            "@ci:php:tests"
         ],
-        "ci:tests:functional": "find 'Tests/Functional' -wholename '*Test.php' | echo \"Running functional test suite {}\"; .Build/bin/phpunit -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml;",
-        "ci:tests:unit": ".Build/bin/phpunit -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/UnitTests.xml Tests/Unit",
-        "ci:yaml": [
-            "@ci:yaml:lint"
-        ],
-        "ci:yaml:lint": "find . ! -path '*.Build/*' ! -path '*node_modules/*' -regextype egrep -regex '.*.ya?ml$' | xargs -r php ./.Build/bin/yaml-lint",
         "coding-standards:reset": [
-            "./.Build/bin/mediatis-typo3-coding-standards-setup reset",
+            "./vendor/bin/mediatis-coding-standards-setup reset",
             "@fix:composer"
         ],
         "coding-standards:update": [
-            "./.Build/bin/mediatis-typo3-coding-standards-setup",
+            "./vendor/bin/mediatis-coding-standards-setup",
             "@fix:composer"
-        ],
-        "coverage:create-directories": "mkdir -p .Build/logs .Build/coverage",
-        "docs:generate": [
-            "@docs:generate:pullimage",
-            "docker run --rm ghcr.io/t3docs/render-documentation show-shell-commands > tempfile.sh; echo 'dockrun_t3rd makehtml' >> tempfile.sh; bash tempfile.sh; rm tempfile.sh"
-        ],
-        "docs:generate:pullimage": [
-            "docker pull ghcr.io/t3docs/render-documentation",
-            "docker tag ghcr.io/t3docs/render-documentation t3docs/render-documentation"
         ],
         "fix": [
             "@fix:composer",
@@ -131,67 +108,33 @@
             "@fix:php:rector",
             "@fix:php:cs"
         ],
-        "fix:php:cs": "php-cs-fixer fix --config .php-cs-fixer.php",
-        "fix:php:rector": "rector",
-        "link-extension": [
-            "@php -r 'is_dir($extFolder=__DIR__.\"/.Build/Web/typo3conf/ext/\") || mkdir($extFolder, 0777, true);'",
-            "@php -r 'file_exists($extFolder=__DIR__.\"/.Build/Web/typo3conf/ext/mediatis_downloads\") || symlink(__DIR__,$extFolder);'"
-        ],
-        "phpstan:baseline": ".Build/bin/phpstan  --generate-baseline=.phpstan/phpstan-baseline.neon",
-        "prepare-release": [
-            "rm .gitignore",
-            "rm -rf .Build",
-            "rm -rf .ddev",
-            "rm -rf .github",
-            "rm -rf .gitlab",
-            "rm -rf Build",
-            "rm -rf Tests",
-            "rm -rf tools",
-            "rm .editorconfig",
-            "rm .gitattributes",
-            "rm .php-cs-fixer.php",
-            "rm .eslintignore",
-            "rm .eslintrc.json",
-            "rm .prettierrc.js",
-            "rm package.json",
-            "rm stylelint.config.js",
-            "rm phive.xml",
-            "rm phpstan-baseline.neon",
-            "rm phpstan.neon",
-            "rm phpcs.xml"
-        ]
+        "fix:php:cs": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php src tests",
+        "fix:php:rector": "./vendor/bin/rector"
     },
     "scripts-descriptions": {
         "ci": "Runs all dynamic and static code checks.",
-        "ci:composer": "Runs all composer checks.",
+        "ci:composer": "Runs all dynamic and static composer checks",
         "ci:composer:normalize": "Checks the composer.json.",
         "ci:composer:psr-verify": "Verifies PSR-4 namespace correctness.",
-        "ci:coverage:functional": "Generates the code coverage report for functional tests.",
-        "ci:coverage:merge": "Merges the code coverage reports for unit and functional tests.",
-        "ci:coverage:unit": "Generates the code coverage report for unit tests.",
-        "ci:dynamic": "Runs all PHPUnit tests (unit and functional).",
-        "ci:json": "Runs all JSON checks.",
-        "ci:json:lint": "Lints the JSON files.",
+        "ci:composer:validate": "Validates the composer.json",
+        "ci:dynamic": "Runs all dynamic tests.",
         "ci:php": "Runs all static checks for the PHP files.",
         "ci:php:cs-fixer": "Checks the code style with the PHP Coding Standards Fixer (PHP-CS-Fixer).",
+        "ci:php:dynamic": "Run all PHP tests",
         "ci:php:lint": "Lints the PHP files for syntax errors.",
         "ci:php:rector": "Checks the code style with the TYPO3 rector (typo3-rector).",
         "ci:php:stan": "Checks the PHP types using PHPStan.",
+        "ci:php:static": "Runs all static code checks on PHP code.",
+        "ci:php:tests": "Run all PHPUnit tests (unit and integration)",
+        "ci:php:tests:integration": "Runs all PHPUnit integration tests.",
+        "ci:php:tests:unit": "Runs all PHPUnit unit tests.",
         "ci:static": "Runs all static code checks (syntax, style, types).",
-        "ci:tests": "Runs all PHPUnit tests (unit and functional).",
-        "ci:tests:functional": "Runs the functional tests.",
-        "ci:tests:unit": "Runs the unit tests.",
-        "ci:yaml": "Runs all YAML checks.",
-        "ci:yaml:lint": "Lints the YAML files.",
-        "coverage:create-directories": "Creates the directories needed for recording and merging the code coverage reports.",
-        "docs:generate": "Renders the extension ReST documentation.",
+        "ci:tests": "Runs all PHPUnit tests (unit and integration).",
         "fix": "Runs all fixers.",
-        "fix:composer": "Runs all composer fixers.",
+        "fix:composer": "Runs all fixers for the composer.json file.",
         "fix:composer:normalize": "Normalizes composer.json file content.",
         "fix:php": "Runs all fixers for the PHP code.",
         "fix:php:cs": "Fixes the code style with PHP-CS-Fixer.",
-        "fix:php:rector": "Fixes the code style with TYPO3 rector.",
-        "phpstan:baseline": "Updates the PHPStan baseline file to match the code.",
-        "prepare-release": "Removes development-only files in preparation of a TER release."
+        "fix:php:rector": "Fixes code structures with PHP Rector."
     }
 }
