@@ -155,6 +155,7 @@ class CodingStandardsSetup
                 $original[$key] = $overrule[$key];
             }
         }
+
         reset($original);
     }
 
