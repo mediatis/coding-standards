@@ -5,6 +5,7 @@ workflow:
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 stages:
     - code-quality
+    - security-scanner
 code-quality:
     parallel:
         matrix:
@@ -31,3 +32,54 @@ code-quality:
     stage: code-quality
     script:
         - 'composer ci'
+'SAST Scan':
+  image: 'returntocorp/semgrep-agent:latest'
+  script: 'semgrep-agent --gitlab-json > gl-sast-scanning-report.json'
+  stage: security-scanner
+  interruptible: true
+  allow_failure: false
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  variables:
+    SEMGREP_RULES: 'p/php p/phpcs-security-audit p/command-injection p/sql-injection p/cwe-top-25 p/owasp-top-ten'
+    SEMGREP_GITLAB_JSON: '1'
+  artifacts:
+    when: always
+    reports:
+      sast: gl-sast-scanning-report.json
+    paths:
+      - gl-sast-scanning-report.json
+'Trivy Scan':
+  stage: security-scanner
+  image: 'docker:stable'
+  services:
+    -
+      name: 'docker:dind'
+      entrypoint:
+        - env
+        - '-u'
+        - DOCKER_HOST
+      command:
+        - dockerd-entrypoint.sh
+  variables:
+    DOCKER_HOST: 'tcp://docker:2375/'
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ''
+  before_script:
+    - 'export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep ''"tag_name":'' | sed -E ''s/.*"v([^"]+)".*/\1/'')'
+    - 'echo $TRIVY_VERSION'
+    - 'wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -'
+  allow_failure: false
+  script:
+    - './trivy fs --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json ./'
+    - './trivy fs --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH ./'
+    - './trivy fs --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress ./'
+  cache:
+    paths:
+      - .trivycache/
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
