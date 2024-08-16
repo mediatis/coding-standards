@@ -1,0 +1,76 @@
+'on':
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+permissions:
+    contents: read
+jobs:
+    code-quality:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php_version:
+                    - '8.1'
+                    - '8.2'
+        steps:
+            -
+                name: Checkout
+                uses: actions/checkout@v4
+            -
+                name: 'Install PHP'
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '${{ matrix.php_version }}'
+                    coverage: none
+                    tools: 'composer:v2.4'
+            -
+                name: 'Show Composer version'
+                run: 'composer --version'
+            -
+                name: 'Show the Composer configuration'
+                run: 'composer config --global --list'
+            -
+                name: 'Cache dependencies installed with composer'
+                uses: actions/cache@v3
+                with:
+                    key: 'php${{ matrix.php_version }}'
+                    path: ~/.cache/composer
+                    restore-keys: "php${{ matrix.php_version }}-composer-\n"
+            -
+                name: 'Install Composer dependencies'
+                run: "composer install --no-progress\n"
+            -
+                name: 'Run command'
+                run: "composer ci\n"
+    trivy:
+        name: trivy
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: 'Checkout code'
+                uses: actions/checkout@v3
+            -
+                name: 'Run Trivy vulnerability scanner in repo mode'
+                uses: aquasecurity/trivy-action@0.20.0
+                with:
+                    scan-type: fs
+                    scan-ref: .
+                    format: table
+                    vuln-type: library
+                    severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+                    exit-code: '1'
+    semgrep:
+        name: semgrep
+        runs-on: ubuntu-latest
+        container:
+            image: semgrep/semgrep
+        if: "(github.actor != 'dependabot[bot]')"
+        steps:
+            -
+                uses: actions/checkout@v4
+            -
+                run: 'semgrep scan --config auto --error'

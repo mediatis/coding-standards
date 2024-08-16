@@ -17,8 +17,8 @@ if (
     exit(1);
 }
 
-$binDirectory = $_composer_bin_dir ?? __DIR__ . '/../../../bin';
-$targetPackageDirectory = realpath($binDirectory . '/../..');
+$binDirectory = isset($argv[1]) && $argv[1] === '.' ? __DIR__ : $_composer_bin_dir ?? __DIR__ . '/../../../bin';
+$targetPackageDirectory = isset($argv[1]) && $argv[1] === '.' ? realpath($binDirectory . '/..') : realpath($binDirectory . '/../..');
 $codingStandardsPackageDirectory = realpath(__DIR__ . '/..');
 $requiredFolderPaths = ['src', 'tests/Unit', 'tests/Integration'];
 $examplePackagePath = 'example-package';
