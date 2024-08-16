@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "28967fa3189a31a3b29a5c0f0366544b",
+    "content-hash": "fd219003fef0e947b39e5ace7383a3ee",
     "packages": [
         {
             "name": "clue/ndjson-react",
@@ -2572,6 +2572,51 @@
             "time": "2023-06-01T09:42:59+00:00"
         },
         {
+            "name": "robrichards/xmlseclibs",
+            "version": "1.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/robrichards/xmlseclibs.git",
+                "reference": "03211d45fc71ef05bb0d6b3bd5f715da60d4a22c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/03211d45fc71ef05bb0d6b3bd5f715da60d4a22c",
+                "reference": "03211d45fc71ef05bb0d6b3bd5f715da60d4a22c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 5.2"
+            },
+            "suggest": {
+                "ext-mcrypt": "MCrypt extension",
+                "ext-openssl": "OpenSSL extension"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A PHP library for XML Security",
+            "homepage": "https://github.com/robrichards/xmlseclibs",
+            "keywords": [
+                "security",
+                "signature",
+                "xml",
+                "xmldsig"
+            ],
+            "support": {
+                "issues": "https://github.com/robrichards/xmlseclibs/issues",
+                "source": "https://github.com/robrichards/xmlseclibs/tree/1.4.3"
+            },
+            "time": "2019-11-12T14:00:55+00:00"
+        },
+        {
             "name": "sebastian/cli-parser",
             "version": "1.0.2",
             "source": {
@@ -3533,6 +3578,59 @@
                 }
             ],
             "time": "2020-09-28T06:39:44+00:00"
+        },
+        {
+            "name": "simplesamlphp/saml2",
+            "version": "v1.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simplesamlphp/saml2.git",
+                "reference": "2a2bd4398257cbe72251c68348be72707cc77262"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simplesamlphp/saml2/zipball/2a2bd4398257cbe72251c68348be72707cc77262",
+                "reference": "2a2bd4398257cbe72251c68348be72707cc77262",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-openssl": "*",
+                "php": ">=5.3.3",
+                "psr/log": "~1.0",
+                "robrichards/xmlseclibs": "^1.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpmd/phpmd": "~1.5",
+                "phpunit/phpunit": "~3.7",
+                "satooshi/php-coveralls": "~0.6.1",
+                "sebastian/phpcpd": "~1.4",
+                "sensiolabs/security-checker": "~1.1",
+                "squizlabs/php_codesniffer": "~1.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "SAML2_": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Åkre Solberg",
+                    "email": "andreas.solberg@uninett.no"
+                }
+            ],
+            "description": "SAML2 PHP library from SimpleSAMLphp",
+            "support": {
+                "issues": "https://github.com/simplesamlphp/saml2/issues",
+                "source": "https://github.com/simplesamlphp/saml2/tree/release-1.9.1"
+            },
+            "time": "2016-12-02T12:45:13+00:00"
         },
         {
             "name": "symfony/console",
@@ -4937,106 +5035,7 @@
             "time": "2024-03-03T12:36:25+00:00"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "robrichards/xmlseclibs",
-            "version": "1.4.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/robrichards/xmlseclibs.git",
-                "reference": "03211d45fc71ef05bb0d6b3bd5f715da60d4a22c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/03211d45fc71ef05bb0d6b3bd5f715da60d4a22c",
-                "reference": "03211d45fc71ef05bb0d6b3bd5f715da60d4a22c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 5.2"
-            },
-            "suggest": {
-                "ext-mcrypt": "MCrypt extension",
-                "ext-openssl": "OpenSSL extension"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "A PHP library for XML Security",
-            "homepage": "https://github.com/robrichards/xmlseclibs",
-            "keywords": [
-                "security",
-                "signature",
-                "xml",
-                "xmldsig"
-            ],
-            "support": {
-                "issues": "https://github.com/robrichards/xmlseclibs/issues",
-                "source": "https://github.com/robrichards/xmlseclibs/tree/1.4.3"
-            },
-            "time": "2019-11-12T14:00:55+00:00"
-        },
-        {
-            "name": "simplesamlphp/saml2",
-            "version": "v1.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/simplesamlphp/saml2.git",
-                "reference": "2a2bd4398257cbe72251c68348be72707cc77262"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/simplesamlphp/saml2/zipball/2a2bd4398257cbe72251c68348be72707cc77262",
-                "reference": "2a2bd4398257cbe72251c68348be72707cc77262",
-                "shasum": ""
-            },
-            "require": {
-                "ext-dom": "*",
-                "ext-openssl": "*",
-                "php": ">=5.3.3",
-                "psr/log": "~1.0",
-                "robrichards/xmlseclibs": "^1.3"
-            },
-            "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpmd/phpmd": "~1.5",
-                "phpunit/phpunit": "~3.7",
-                "satooshi/php-coveralls": "~0.6.1",
-                "sebastian/phpcpd": "~1.4",
-                "sensiolabs/security-checker": "~1.1",
-                "squizlabs/php_codesniffer": "~1.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "SAML2_": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Åkre Solberg",
-                    "email": "andreas.solberg@uninett.no"
-                }
-            ],
-            "description": "SAML2 PHP library from SimpleSAMLphp",
-            "support": {
-                "issues": "https://github.com/simplesamlphp/saml2/issues",
-                "source": "https://github.com/simplesamlphp/saml2/tree/release-1.9.1"
-            },
-            "time": "2016-12-02T12:45:13+00:00"
-        }
-    ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
