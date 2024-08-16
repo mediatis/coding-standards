@@ -2,7 +2,6 @@
     push:
         branches:
             - main
-            - feature/security-checks
     pull_request:
         branches:
             - main
