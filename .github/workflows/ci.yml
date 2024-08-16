@@ -63,6 +63,7 @@ jobs:
               vuln-type: 'library'
               severity: 'MEDIUM,CRITICAL,HIGH'
               exit-code: '1'
+              list-all-pkgs: true
     semgrep:
         name: semgrep
         runs-on: ubuntu-latest
