@@ -69,7 +69,7 @@
         ],
         "ci:php:lint": "find .*.php *.php src tests -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
         "ci:php:rector": "./vendor/bin/rector --dry-run",
-        "ci:php:stan": "php -d memory_limit=228M ./vendor/bin/phpstan --no-progress --no-interaction analyse",
+        "ci:php:stan": "php -d memory_limit=228M ./vendor/bin/phpstan --no-progress --no-interaction analyse -c phpstan.selftest.neon",
         "ci:php:static": [
             "@ci:php:rector",
             "@ci:php:cs-fixer",
