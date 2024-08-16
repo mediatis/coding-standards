@@ -46,27 +46,23 @@ jobs:
             -
                 name: 'Run command'
                 run: "composer ci\n"
-        trivy:
-            name: trivy
-            runs-on: ubuntu-latest
-            steps:
-                -
-                    name: 'Checkout code'
-                    uses: actions/checkout@v3
-                -
-                    name: 'Run Trivy vulnerability scanner in repo mode'
-                    uses: aquasecurity/trivy-action@0.20.0
-                    with:
-                        scan-type: fs
-                        scan-ref: .
-                        hide-progress: false
-                        format: table
-                        vuln-type: library
-                        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-                        exit-code: '1'
-                        list-all-pkgs: true
-                        ignore-unfixed: true
-                        output: table
+    trivy:
+        name: trivy
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: 'Checkout code'
+                uses: actions/checkout@v3
+            -
+                name: 'Run Trivy vulnerability scanner in repo mode'
+                uses: aquasecurity/trivy-action@0.20.0
+                with:
+                    scan-type: fs
+                    scan-ref: .
+                    format: table
+                    vuln-type: library
+                    severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+                    exit-code: '1'
     semgrep:
         name: semgrep
         runs-on: ubuntu-latest
