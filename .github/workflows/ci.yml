@@ -50,18 +50,19 @@ jobs:
         name: trivy
         runs-on: ubuntu-22.04
         steps:
-            -
-                name: 'Checkout code'
-                uses: actions/checkout@v3
-            -
-                name: 'Run Trivy vulnerability scanner in repo mode'
-                uses: aquasecurity/trivy-action@0.20.0
-                with:
-                    list-all-pkgs: true
-                    scan-type: fs
-                    ignore-unfixed: true
-                    format: table
-                    severity: CRITICAL
+          - name: Checkout code
+            uses: actions/checkout@v3
+
+          - name: Run Trivy vulnerability scanner
+            uses: aquasecurity/trivy-action@master
+            with:
+              scan-type: 'fs'
+              scan-ref: '.'
+              hide-progress: false
+              format: 'table'
+              severity: 'MEDIUM,CRITICAL,HIGH'
+              exit-code: '1'
+              trivy-config: trivy_rule.yaml
     semgrep:
         name: semgrep
         runs-on: ubuntu-22.04
