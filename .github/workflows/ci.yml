@@ -9,7 +9,7 @@ permissions:
     contents: read
 jobs:
     code-quality:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
@@ -48,7 +48,7 @@ jobs:
                 run: "composer ci\n"
     trivy:
         name: trivy
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
           - name: Checkout code
             uses: actions/checkout@v3
@@ -60,11 +60,12 @@ jobs:
               scan-ref: './../../'
               hide-progress: false
               format: 'table'
+              vuln-type: 'library'
               severity: 'MEDIUM,CRITICAL,HIGH'
               exit-code: '1'
     semgrep:
         name: semgrep
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         container:
             image: semgrep/semgrep
         if: "(github.actor != 'dependabot[bot]')"
