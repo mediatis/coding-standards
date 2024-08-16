@@ -35,7 +35,7 @@ class CodingStandardsSetup
         $constraints = $versionParser->parseConstraints($constraint);
         $semVer = new Semver();
         foreach ($allowedVersions as $allowedVersion) {
-            if ($semVer::satisfies($allowedVersion, $constraints->getPrettyString())) {
+            if ($semVer::satisfies((string)$allowedVersion, $constraints->getPrettyString())) {
                 $versions[] = $allowedVersion;
             }
         }
@@ -57,6 +57,11 @@ class CodingStandardsSetup
         }
     }
 
+    /**
+     * @return float[]
+     *
+     * @throws JsonException
+     */
     protected function getDependencyVersionConstraintsFromComposerData(string $package, string $type = 'full'): array
     {
         $allowedVersions = $this->supportedPackageVersions[$package]['versions'];
@@ -80,12 +85,12 @@ class CodingStandardsSetup
                 }
             }
 
-            if ($versions !== null && $versions !== []) {
+            if ($versions !== []) {
                 break;
             }
         }
 
-        if ($versions === null || $versions === []) {
+        if ($versions === []) {
             throw new Exception('Package version mismatch detected. Supported ' . $package . ' versions are: ' . implode(', ', $allowedVersions));
         }
 
@@ -190,7 +195,7 @@ class CodingStandardsSetup
             'composer.json' => $this->updateFileContentsComposerJson($sourceContents, $targetContents, $config),
             '.github/workflows/ci.yml' => $this->updateFileContentsYaml($sourceContents, $targetContents, $config),
             '.gitlab-ci.yml' => $this->updateFileContentsYaml($sourceContents, $targetContents, $config),
-            default => throw new Exception('No information how to process "%s" found!', $filePath),
+            default => throw new Exception(sprintf('No information how to process "%s" found!', $filePath)),
         };
     }
 
@@ -208,10 +213,14 @@ class CodingStandardsSetup
      *
      * @throws JsonException
      */
-    protected function updateFile(string $filePath, ?string $targetFilePath = null, ?array $config = null): void
+    protected function updateFile(string $filePath, ?string $targetFilePath = null, ?array $config = null, bool $keepExistingFile = false): void
     {
         $sourcePath = $this->getSourcePath($filePath);
         $targetPath = $this->getTargetPath($targetFilePath ?? $filePath);
+        if (file_exists($targetPath) && $keepExistingFile) {
+            return;
+        }
+
         $sourceContents = file_exists($sourcePath) ? file_get_contents($sourcePath) : '';
         if ($sourceContents === false) {
             throw new Exception(sprintf('Source file "%s" not found!', $sourcePath));
@@ -254,7 +263,8 @@ class CodingStandardsSetup
 
     protected function setupPhpStanConfig(): void
     {
-        $this->updateFile('phpstan.neon');
+        // It may be necessary to have your own ruleset, so we keep the existing file
+        $this->updateFile('phpstan.neon', keepExistingFile: true);
     }
 
     protected function setupCiPipeline(): void

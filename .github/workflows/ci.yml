@@ -1,83 +1,76 @@
-on:
-  push:
-    branches:
-      - main
-      - feature/security-checks
-  pull_request:
-    branches:
-      - main
+'on':
+    push:
+        branches:
+            - main
+            - feature/security-checks
+    pull_request:
+        branches:
+            - main
 permissions:
-  contents: read
+    contents: read
 jobs:
-  code-quality:
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        php_version:
-          - '8.1'
-          - '8.2'
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: 'Install PHP'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '${{ matrix.php_version }}'
-          coverage: none
-          tools: 'composer:v2.4'
-      -
-        name: 'Show Composer version'
-        run: 'composer --version'
-      -
-        name: 'Show the Composer configuration'
-        run: 'composer config --global --list'
-      -
-        name: 'Cache dependencies installed with composer'
-        uses: actions/cache@v3
-        with:
-          key: 'php${{ matrix.php_version }}'
-          path: ~/.cache/composer
-          restore-keys: "php${{ matrix.php_version }}-composer-\n"
-      -
-        name: 'Install Composer dependencies'
-        run: "composer install --no-progress\n"
-      -
-        name: 'Run command'
-        run: "composer ci\n"
-  trivy:
-    name: trivy
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL'
-
-  semgrep:
-    # User definable name of this GitHub Actions job.
-    name: semgrep
-    # If you are self-hosting, change the following `runs-on` value:
-    runs-on: ubuntu-22.04
-
-    container:
-      # A Docker image with Semgrep installed. Do not change this.
-      image: semgrep/semgrep
-
-    # Skip any PR created by dependabot to avoid permission issues:
-    if: (github.actor != 'dependabot[bot]')
-
-    steps:
-      # Fetch project source with GitHub Actions Checkout. Use either v3 or v4.
-      - uses: actions/checkout@v4
-      # Run the "semgrep scan" command on the command line of the docker image.
-      - run: semgrep scan --config auto --error
+    code-quality:
+        runs-on: ubuntu-22.04
+        strategy:
+            fail-fast: false
+            matrix:
+                php_version:
+                    - '8.1'
+                    - '8.2'
+        steps:
+            -
+                name: Checkout
+                uses: actions/checkout@v4
+            -
+                name: 'Install PHP'
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '${{ matrix.php_version }}'
+                    coverage: none
+                    tools: 'composer:v2.4'
+            -
+                name: 'Show Composer version'
+                run: 'composer --version'
+            -
+                name: 'Show the Composer configuration'
+                run: 'composer config --global --list'
+            -
+                name: 'Cache dependencies installed with composer'
+                uses: actions/cache@v3
+                with:
+                    key: 'php${{ matrix.php_version }}'
+                    path: ~/.cache/composer
+                    restore-keys: "php${{ matrix.php_version }}-composer-\n"
+            -
+                name: 'Install Composer dependencies'
+                run: "composer install --no-progress\n"
+            -
+                name: 'Run command'
+                run: "composer ci\n"
+    trivy:
+        name: trivy
+        runs-on: ubuntu-22.04
+        steps:
+            -
+                name: 'Checkout code'
+                uses: actions/checkout@v3
+            -
+                name: 'Run Trivy vulnerability scanner in repo mode'
+                uses: aquasecurity/trivy-action@0.20.0
+                with:
+                    scan-type: fs
+                    ignore-unfixed: true
+                    format: sarif
+                    output: trivy-results.sarif
+                    severity: CRITICAL
+    semgrep:
+        name: semgrep
+        runs-on: ubuntu-22.04
+        container:
+            image: semgrep/semgrep
+        if: "(github.actor != 'dependabot[bot]')"
+        steps:
+            -
+                uses: actions/checkout@v4
+            -
+                run: 'semgrep scan --config auto --error'

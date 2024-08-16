@@ -6,6 +6,9 @@ use PhpCsFixer\Config;
 
 class CsFixerSetup
 {
+    /**
+     * @return array<string, mixed>
+     */
     public static function getRules(): array
     {
         return [
@@ -32,6 +35,11 @@ class CsFixerSetup
         ];
     }
 
+    /**
+     * @param array<string, mixed> $rules
+     *
+     * @return void
+     */
     protected static function appendRules(Config $config, array $rules): void
     {
         $rules = array_replace_recursive($config->getRules(), $rules);

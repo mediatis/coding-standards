@@ -29,6 +29,9 @@ class RectorSetup
         ];
     }
 
+    /**
+     * @return string[]
+     */
     protected static function paths(string $packagePath): array
     {
         return [
