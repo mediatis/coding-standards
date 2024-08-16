@@ -64,6 +64,7 @@ jobs:
               severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
               exit-code: '1'
               list-all-pkgs: true
+              debug: true
     semgrep:
         name: semgrep
         runs-on: ubuntu-latest
