@@ -58,10 +58,10 @@ jobs:
                 name: 'Run Trivy vulnerability scanner in repo mode'
                 uses: aquasecurity/trivy-action@0.20.0
                 with:
+                    list-all-pkgs: true
                     scan-type: fs
                     ignore-unfixed: true
-                    format: sarif
-                    output: trivy-results.sarif
+                    format: table
                     severity: CRITICAL
     semgrep:
         name: semgrep
