@@ -57,11 +57,11 @@ jobs:
             uses: aquasecurity/trivy-action@master
             with:
               scan-type: 'fs'
-              scan-ref: './../../'
+              scan-ref: '.'
               hide-progress: false
               format: 'table'
               vuln-type: 'library'
-              severity: 'MEDIUM,CRITICAL,HIGH'
+              severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
               exit-code: '1'
               list-all-pkgs: true
     semgrep:
