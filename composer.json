@@ -21,9 +21,9 @@
         "composer/semver": "^3.4",
         "ergebnis/composer-normalize": "^2.28",
         "friendsofphp/php-cs-fixer": "^3.27",
-        "phpstan/phpstan": "^1.10.27",
+        "phpstan/phpstan": "^1.12.3",
         "phpunit/phpunit": "^9.5",
-        "rector/rector": "0.17.0",
+        "rector/rector": "^1.2.5",
         "symfony/yaml": "^5.3.6 || ^6.2.0"
     },
     "autoload": {

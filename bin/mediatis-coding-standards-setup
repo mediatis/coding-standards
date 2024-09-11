@@ -25,7 +25,7 @@ $examplePackagePath = 'example-package';
 $supportedPackageVersions = [
     'php' => [
         'packageKeys' => ['php'],
-        'versions' => ['8.1', '8.2'],
+        'versions' => ['8.1', '8.2', '8.3'],
     ],
 ];
 
