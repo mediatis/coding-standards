@@ -283,6 +283,13 @@ class CodingStandardsSetup
                         ],
                     ],
                 ],
+                'code-tests' => [
+                    'parallel' => [
+                        'matrix' => [
+                            $matrix,
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -290,6 +297,11 @@ class CodingStandardsSetup
             config: [
                 'jobs' => [
                     'code-quality' => [
+                        'strategy' => [
+                            'matrix' => $matrix,
+                        ],
+                    ],
+                    'code-tests' => [
                         'strategy' => [
                             'matrix' => $matrix,
                         ],
