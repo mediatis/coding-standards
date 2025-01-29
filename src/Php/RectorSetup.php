@@ -3,14 +3,9 @@
 namespace Mediatis\CodingStandards\Php;
 
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
-use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
-use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\Node\RemoveNonExistingVarAnnotationRector;
-use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
-use Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector;
-use Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
@@ -46,14 +41,9 @@ class RectorSetup
     protected static function skip(string $packagePath): array
     {
         return [
-            ClosureToArrowFunctionRector::class,
-            FinalizePublicClassConstantRector::class,
             RemoveNonExistingVarAnnotationRector::class, // conflicts with phpstan
             RemoveUselessReturnTagRector::class, // conflicts with phpstan
             CatchExceptionNameMatchingTypeRector::class,
-            AddLiteralSeparatorToNumberRector::class,
-            UnSpreadOperatorRector::class, // breaks code, removed in rector 0.18
-            VarConstantCommentRector::class, // conflicts with other standards (array<string>), removed in latest rector
         ];
     }
 

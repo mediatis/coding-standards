@@ -75,7 +75,7 @@ class CodingStandardsSetup
 
             $composerFileContentsAsArray = json_decode($composerFileContents, associative: true, flags: JSON_THROW_ON_ERROR);
             if (isset($composerFileContentsAsArray['require'][$key])) {
-                if ($type == 'major') {
+                if ($type === 'major') {
                     $versions = $this->extractVersions($composerFileContentsAsArray['require'][$key], $allowedVersions);
                     foreach ($versions as $key => $number) {
                         $versions[$key] = (int)$number;
