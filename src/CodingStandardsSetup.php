@@ -62,7 +62,7 @@ class CodingStandardsSetup
      *
      * @throws JsonException
      */
-    protected function getDependencyVersionConstraintsFromComposerData(string $package, string $type = 'full'): array
+    protected function getDependencyVersionConstraintsFromComposerData(string $package, string $type = 'full', string $outputType = 'float'): array
     {
         $allowedVersions = $this->supportedPackageVersions[$package]['versions'];
         $versions = [];
@@ -78,10 +78,13 @@ class CodingStandardsSetup
                 if ($type === 'major') {
                     $versions = $this->extractVersions($composerFileContentsAsArray['require'][$key], $allowedVersions);
                     foreach ($versions as $key => $number) {
-                        $versions[$key] = (int)$number;
+                        $versions[$key] = $outputType === 'string' ? (string)(int)$number : (int)$number;
                     }
                 } else {
                     $versions = $this->extractVersions($composerFileContentsAsArray['require'][$key], $allowedVersions);
+                    foreach ($versions as $key => $number) {
+                        $versions[$key] = $outputType === 'string' ? (string)$number : $number;
+                    }
                 }
             }
 
@@ -95,6 +98,28 @@ class CodingStandardsSetup
         }
 
         return $versions;
+    }
+
+    /**
+     * @return string
+     *
+     * @throws JsonException
+     */
+    protected function getPackageNameFromComposerData(): string
+    {
+        $composerFilePath = $this->targetPackageDirectory . '/composer.json';
+        $composerFileContents = file_get_contents($composerFilePath);
+        if ($composerFileContents === false) {
+            throw new Exception(sprintf('File "%s" not found!', $composerFilePath));
+        }
+
+        $composerFileContentsAsArray = json_decode($composerFileContents, associative: true, flags: JSON_THROW_ON_ERROR);
+        $packageNameWithVendorName = explode('/', (string)$composerFileContentsAsArray['name']);
+        if (!isset($packageNameWithVendorName[1]) || $packageNameWithVendorName[1] === '') {
+            throw new Exception('parameter "name" needs to exist in composer.json and contain a vendor-name/package-name structure.');
+        }
+
+        return $packageNameWithVendorName[1];
     }
 
     /**
@@ -146,6 +171,18 @@ class CodingStandardsSetup
     }
 
     /**
+     * @param array<string,mixed> $config
+     */
+    protected function updateFileContentsTxt(string $sourceContents, string $targetContents, array $config): string
+    {
+        foreach ($config as $from => $to) {
+            $sourceContents = str_replace($from, $to, $sourceContents);
+        }
+
+        return $sourceContents;
+    }
+
+    /**
      * @param array<mixed> $original Original array. It will be *modified* by this method and contains the result afterwards!
      * @param array<mixed> $overrule Overrule array, overruling the original array
      */
@@ -192,9 +229,11 @@ class CodingStandardsSetup
     protected function updateFileContents(string $sourceContents, string $targetContents, string $filePath, array $config): string
     {
         return match ($filePath) {
+            '.ddev/config.yaml' => $this->updateFileContentsYaml($sourceContents, $targetContents, $config),
             'composer.json' => $this->updateFileContentsComposerJson($sourceContents, $targetContents, $config),
             '.github/workflows/ci.yml' => $this->updateFileContentsYaml($sourceContents, $targetContents, $config),
             '.gitlab-ci.yml' => $this->updateFileContentsYaml($sourceContents, $targetContents, $config),
+            'rector.php' => $this->updateFileContentsTxt($sourceContents, $targetContents, $config),
             default => throw new Exception(sprintf('No information how to process "%s" found!', $filePath)),
         };
     }
@@ -258,7 +297,15 @@ class CodingStandardsSetup
 
     protected function setupRectorConfig(): void
     {
-        $this->updateFile('rector.php');
+        $phpVersions = $this->getDependencyVersionConstraintsFromComposerData('php', '');
+        $phpVersion = match ($phpVersions[0]) {
+            8.2 => 'PHP_82',
+            8.3 => 'PHP_83',
+            default => throw new Exception('Unable to set up rector due to version mismatch. Supported PHP versions are: ' . implode(', ', $this->supportedPackageVersions['php']['versions'])),
+        };
+        $this->updateFile('rector.php', config: [
+            'PHP_VERSION_PLACEHOLDER' => $phpVersion,
+        ]);
     }
 
     protected function setupPhpStanConfig(): void
@@ -271,7 +318,7 @@ class CodingStandardsSetup
     {
         $matrix = [];
         foreach (array_keys($this->supportedPackageVersions) as $package) {
-            $matrix[$package . '_version'] = $this->getDependencyVersionConstraintsFromComposerData($package);
+            $matrix[$package . '_version'] = $this->getDependencyVersionConstraintsFromComposerData($package, outputType: 'string');
         }
 
         $this->updateFile('.gitlab-ci.yml',
@@ -285,6 +332,11 @@ class CodingStandardsSetup
                 ],
             ]
         );
+
+        $matrix = [];
+        foreach (array_keys($this->supportedPackageVersions) as $package) {
+            $matrix[$package . '_version'] = $this->getDependencyVersionConstraintsFromComposerData($package);
+        }
 
         $this->updateFile('.github/workflows/ci.yml',
             config: [

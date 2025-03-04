@@ -2,22 +2,31 @@
 
 namespace Mediatis\CodingStandards\Php;
 
+use Exception;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\Node\RemoveNonExistingVarAnnotationRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\ValueObject\PhpVersion;
 
 class RectorSetup
 {
+    protected static int $phpVersion;
+
     /**
      * @return array<string>
      */
     protected static function sets(): array
     {
         return [
-            LevelSetList::UP_TO_PHP_81,
+            match (static::$phpVersion) {
+                PhpVersion::PHP_82 => LevelSetList::UP_TO_PHP_82,
+                PhpVersion::PHP_83 => LevelSetList::UP_TO_PHP_83,
+                default => throw new Exception(sprintf('unkonwn PHP version "%s"', static::$phpVersion)),
+            },
             SetList::CODING_STYLE,
             SetList::CODE_QUALITY,
             SetList::DEAD_CODE,
@@ -47,8 +56,10 @@ class RectorSetup
         ];
     }
 
-    public static function setup(RectorConfig $rectorConfig, string $packagePath): void
+    public static function setup(RectorConfig $rectorConfig, string $packagePath, int $phpVersion = PhpVersion::PHP_82): void
     {
+        static::$phpVersion = $phpVersion;
+
         $rectorConfig->paths(static::paths($packagePath));
 
         $rectorConfig->importNames(true, true);
@@ -56,5 +67,7 @@ class RectorSetup
         $rectorConfig->sets(static::sets());
 
         $rectorConfig->skip(static::skip($packagePath));
+
+        $rectorConfig->rules([TypedPropertyFromStrictConstructorRector::class]);
     }
 }

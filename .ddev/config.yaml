@@ -1,0 +1,18 @@
+name: coding-standards
+type: php
+docroot: ""
+php_version: "8.2"
+webserver_type: nginx-fpm
+router_http_port: "8081"
+router_https_port: "4434"
+xdebug_enabled: false
+database:
+  type: mariadb
+  version: "10.5"
+hooks:
+  post-start:
+    - exec: composer install --no-progress
+omit_containers: [dba, ddev-ssh-agent]
+webimage_extra_packages: [parallel]
+use_dns_when_possible: true
+composer_version: "2"
