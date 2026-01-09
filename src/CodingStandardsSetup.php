@@ -77,13 +77,13 @@ class CodingStandardsSetup
             if (isset($composerFileContentsAsArray['require'][$key])) {
                 if ($type === 'major') {
                     $versions = $this->extractVersions($composerFileContentsAsArray['require'][$key], $allowedVersions);
-                    foreach ($versions as $key => $number) {
-                        $versions[$key] = $outputType === 'string' ? (string)(int)$number : (int)$number;
+                    foreach ($versions as $versionKey => $number) {
+                        $versions[$versionKey] = $outputType === 'string' ? (string)(int)$number : (int)$number;
                     }
                 } else {
                     $versions = $this->extractVersions($composerFileContentsAsArray['require'][$key], $allowedVersions);
-                    foreach ($versions as $key => $number) {
-                        $versions[$key] = $outputType === 'string' ? (string)$number : $number;
+                    foreach ($versions as $versionKey => $number) {
+                        $versions[$versionKey] = $outputType === 'string' ? (string)$number : $number;
                     }
                 }
             }
@@ -134,7 +134,7 @@ class CodingStandardsSetup
                 throw new Exception(sprintf('Key "%s" not found in source data!', $key));
             }
 
-            if ($merge && isset($targetData[$key]) && is_array($targetData[$key])) {
+            if ((bool)$merge && isset($targetData[$key]) && is_array($targetData[$key])) {
                 foreach ($sourceData[$key] as $configKey => $configValue) {
                     if (array_key_exists($configKey, $targetData[$key])) {
                         unset($targetData[$key][$configKey]);
@@ -375,7 +375,7 @@ class CodingStandardsSetup
         $this->setupCsFixerConfig();
         $this->setupRectorConfig();
         $this->setupPhpStanConfig();
-        $this->setupCIPipeline();
+        $this->setupCiPipeline();
         $this->setupComposerJson();
         $this->setupRequiredFolders();
     }

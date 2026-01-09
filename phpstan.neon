@@ -4,3 +4,8 @@ parameters:
     - ../../../src
     - ../../../tests
   reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    # PHPUnit assertions are static but idiomatically called via $this->
+    - identifier: staticMethod.dynamicCall
+      paths:
+        - ../../../tests/*
