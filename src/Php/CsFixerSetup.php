@@ -3,6 +3,7 @@
 namespace Mediatis\CodingStandards\Php;
 
 use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
 class CsFixerSetup
 {
@@ -58,6 +59,17 @@ class CsFixerSetup
 
         if ($append) {
             static::appendRules($config, static::getRules());
+
+            // Configure finder with standard directories
+            $finder = $config->getFinder();
+            if ($finder instanceof Finder) {
+                $directories = ['src', 'tests'];
+                foreach ($directories as $directory) {
+                    if (is_dir($directory)) {
+                        $finder->in($directory);
+                    }
+                }
+            }
         } else {
             $config->setRules(static::getRules());
         }
