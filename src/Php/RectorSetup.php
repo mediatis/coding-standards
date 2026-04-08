@@ -10,6 +10,7 @@ use Rector\DeadCode\Rector\Node\RemoveNonExistingVarAnnotationRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use Rector\ValueObject\PhpVersion;
 
 class RectorSetup
@@ -53,6 +54,7 @@ class RectorSetup
             RemoveNonExistingVarAnnotationRector::class, // conflicts with phpstan
             RemoveUselessReturnTagRector::class, // conflicts with phpstan
             CatchExceptionNameMatchingTypeRector::class,
+            SafeDeclareStrictTypesRector::class, // don't enforce strict_types on existing codebases
         ];
     }
 
