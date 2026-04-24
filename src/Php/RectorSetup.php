@@ -26,6 +26,8 @@ class RectorSetup
             match (static::$phpVersion) {
                 PhpVersion::PHP_82 => LevelSetList::UP_TO_PHP_82,
                 PhpVersion::PHP_83 => LevelSetList::UP_TO_PHP_83,
+                PhpVersion::PHP_84 => LevelSetList::UP_TO_PHP_84,
+                PhpVersion::PHP_85 => LevelSetList::UP_TO_PHP_85,
                 default => throw new Exception(sprintf('unkonwn PHP version "%s"', static::$phpVersion)),
             },
             SetList::CODING_STYLE,

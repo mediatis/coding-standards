@@ -301,6 +301,8 @@ class CodingStandardsSetup
         $phpVersion = match ($phpVersions[0]) {
             8.2 => 'PHP_82',
             8.3 => 'PHP_83',
+            8.4 => 'PHP_84',
+            8.5 => 'PHP_85',
             default => throw new Exception('Unable to set up rector due to version mismatch. Supported PHP versions are: ' . implode(', ', $this->supportedPackageVersions['php']['versions'])),
         };
         $this->updateFile('rector.php', config: [
