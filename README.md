@@ -19,17 +19,15 @@ Install the coding-standards package.
 composer require --dev --with-all-dependencies mediatis/coding-standards
 ```
 
-Run the kickstart script to install configuration files.
+Then generate the configuration files (`.php-cs-fixer.php`, `rector.php`, `phpstan.neon`, `.gitlab-ci.yml`, `.github/workflows/ci.yml`, the `composer ci` / `composer fix` scripts and the `src` / `tests` folders) with the **`mediatis-php-coding-standards`** Claude Code skill.
 
-```
-./vendor/bin/mediatis-coding-standards-setup
-```
+In Claude Code, ask something like *"set up mediatis coding standards for this package"*. The skill can:
 
-The files that are usually merged (mostly CI configuration) can be reset and overwritten with the argument `reset`. The `composer.json` is an exception; it is always merged.
+- **scaffold** a brand-new package from scratch,
+- **add** the config to an existing package (merging into `composer.json` without clobbering your keys), or
+- **reset** the generated files (overwrite drifted CI/config), the `composer.json` scripts being merged rather than replaced.
 
-```
-./vendor/bin/mediatis-coding-standards-setup reset
-```
+These are the same jobs the removed `mediatis-coding-standards-setup` binary used to do.
 
 ## Usage - Check
 
