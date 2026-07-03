@@ -1,5 +1,10 @@
 # Code Quality Package
 
+> [!WARNING]
+> **This package is deprecated and no longer maintained.**
+> Existing consumers keep working, but no further development is planned. New
+> packages should not be scaffolded by it.
+
 ## Installation
 
 Make sure that you removed old code quality and pipeline configuration files or folders, e.g. `rector.php`, `.php-cs-fixer.php`, `.phpstan`.

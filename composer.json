@@ -3,6 +3,7 @@
     "description": "Mediatis - Coding Standards",
     "license": "GPL-2.0-or-later",
     "type": "library",
+    "abandoned": true,
     "keywords": [
         "coding standards",
         "php"
